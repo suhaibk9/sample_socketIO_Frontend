@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=devi   ce-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Hello World</h1>
+    <button type="button" id="btn">Click Me</button>
+    <button id="connectionBtn">Fetch Connection Id</button>
+    <div id="connectionResponse"></div>
+    <div id="submissionResponse"></div>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const userId = 312;
+        const socket = io('http://localhost:3001');
+        document.addEventListener('DOMContentLoaded', () => {
+            socket.on('connect', () => {
+                console.log(`Connected to server with id: ${socket.id} and running on port: ${socket.io.uri}`);
+            });
+            socket.on("connect_error", (err) => {
+                console.log(err.message);
+                console.log(err.description);
+                console.log(err.context);
+            });
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server with id: ', socket.id);
+            });
+            //connectionBtn
+            const connectionBtn = document.getElementById('connectionBtn');
+            connectionBtn.addEventListener('click', () => {
+                socket.emit('getConnectionId', userId);
+            });
+            //btn
+            const btn = document.getElementById('btn');
+            btn.addEventListener('click', () => {
+                socket.emit('setUserId', userId);
+            });
+            //connectionResponse
+            socket.on('connectionId', (connectionId) => {
+                const connectionResponse = document.getElementById('connectionResponse');
+                connectionResponse.textContent = `Connection Id: ${connectionId}`;
+            });
+            socket.on('submissionPayloadResponse', data => {
+                document.getElementById('submissionResponse').textContent = JSON.stringify(data);
+            })
+        });
+    </script>
+</body>
+
+</html>
